@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Instance folder (SQLite DB)
+instance/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker (not needed for Vercel)
+Dockerfile
+.dockerignore
+
+# Byte-compiled
+*.pyc
+*.pyo
+
+# Migrations (run locally, not on Vercel)
+# migrations/  — keep tracked so collaborators can use them
+
+# Misc
+*.log

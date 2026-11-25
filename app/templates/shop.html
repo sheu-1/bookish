@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}The Shop — bookish{% endblock %}
+
+{% block content %}
+<!-- Shop Banner (Pink) -->
+<section class="shop-banner">
+  <div class="container">
+    <nav class="shop-breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ url_for('catalog.home') }}" style="color: var(--ink); opacity: 0.8;">Home</a>
+      <span>/</span>
+      <span style="font-weight: 800;">Shop</span>
+      {% if current_genre and current_genre != 'all' %}
+        <span>/</span>
+        <span style="font-weight: 800; text-transform: capitalize;">{{ current_genre }}</span>
+      {% endif %}
+    </nav>
+    <h1 class="shop-title">The shop</h1>
+  </div>
+</section>
+
+<!-- Catalog Main Area -->
+<section style="padding: 24px 0 80px;">
+  <div class="container">
+    <!-- Filter Row: Genre Chips + Sort -->
+    <div class="filter-toolbar">
+      <div class="genre-chips-wrap">
+        <a href="{{ url_for('catalog.shop', sort=current_sort, q=search_query) }}"
+           class="genre-chip {% if current_genre == 'all' or not current_genre %}active{% endif %}">
+          All
+        </a>
+        {% for cat in categories %}
+          <a href="{{ url_for('catalog.shop', genre=cat.slug, sort=current_sort, q=search_query) }}"
+             class="genre-chip chip-{{ cat.slug }} {% if current_genre == cat.slug %}active{% endif %}">
+            {{ cat.name }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <div class="filter-meta-right">
+        <span class="results-count">Showing {{ pagination.total }} {{ 'books' if pagination.total != 1 else 'book' }}</span>
+
+        <form method="GET" action="{{ url_for('catalog.shop') }}" id="sortForm">
+          {% if current_genre and current_genre != 'all' %}
+            <input type="hidden" name="genre" value="{{ current_genre }}">
+          {% endif %}
+          {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+          {% endif %}
+          <select name="sort" class="sort-select" onchange="document.getElementById('sortForm').submit()" aria-label="Sort books">
+            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Sort: Newest</option>
+            <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+          </select>
+        </form>
+      </div>
+    </div>
+
+    {% if search_query %}
+      <div style="margin: 16px 0 24px; font-size: 18px; font-weight: 700;">
+        Search results for: <span style="background-color: var(--sunshine); padding: 2px 8px; border-radius: 8px;">"{{ search_query }}"</span>
+        <a href="{{ url_for('catalog.shop', genre=current_genre) }}" style="font-size: 14px; margin-left: 12px; color: var(--violet); text-decoration: underline;">Clear search</a>
+      </div>
+    {% endif %}
+
+    <!-- Book Grid -->
+    {% if books %}
+      <div class="books-grid-4" style="margin-top: 24px;">
+        {% for book in books %}
+          {% include 'partials/book_card.html' %}
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if pagination.pages > 1 %}
+        <nav class="pagination-wrap" aria-label="Pagination">
+          {% if pagination.has_prev %}
+            <a href="{{ url_for('catalog.shop', page=pagination.prev_num, genre=current_genre, sort=current_sort, q=search_query) }}" class="page-num" aria-label="Previous Page">&larr;</a>
+          {% endif %}
+
+          {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p %}
+              <a href="{{ url_for('catalog.shop', page=p, genre=current_genre, sort=current_sort, q=search_query) }}"
+                 class="page-num {% if p == pagination.page %}active{% endif %}">
+                {{ p }}
+              </a>
+            {% else %}
+              <span style="color: var(--muted); font-weight: 800;">…</span>
+            {% endif %}
+          {% endfor %}
+
+          {% if pagination.has_next %}
+            <a href="{{ url_for('catalog.shop', page=pagination.next_num, genre=current_genre, sort=current_sort, q=search_query) }}" class="btn btn-sunshine btn-sm" style="margin-left: 8px;">
+              Next page &rarr;
+            </a>
+          {% endif %}
+        </nav>
+      {% endif %}
+
+    {% else %}
+      <div style="text-align: center; padding: 80px 20px; background-color: var(--white); border: var(--border-ink); border-radius: var(--radius-card); margin-top: 32px;">
+        <h3 style="font-size: 32px; margin-bottom: 12px;">No books found</h3>
+        <p style="color: var(--muted); font-size: 18px; margin-bottom: 24px;">Try searching for another title, author, or reset your filters.</p>
+        <a href="{{ url_for('catalog.shop') }}" class="btn btn-tangerine">Browse all books</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

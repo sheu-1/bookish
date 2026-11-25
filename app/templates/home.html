@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}bookish — Find Your Next Favourite Read{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-panel">
+      <div class="hero-content-col">
+        <span class="hero-pill-tag">New season reads</span>
+        <h1 class="hero-headline">
+          Find your next <span class="highlight-word">favourite</span> read.
+        </h1>
+        <p class="hero-subtext">
+          Curated page-turners, timeless classics, and thought-provoking nonfiction. Delivered quickly to your doorstep across Kenya with secure Paystack checkout.
+        </p>
+        <div class="hero-actions">
+          <a href="{{ url_for('catalog.shop') }}" class="btn btn-tangerine btn-lg">
+            <span>Shop books</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="#shelves" class="btn btn-outlined-white btn-lg">Browse genres</a>
+        </div>
+      </div>
+
+      <div class="hero-visual-col">
+        <div class="hero-cover-stack">
+          <!-- Tangerine cover -->
+          <div class="hero-stack-cover hero-cover-1">
+            <span style="font-family: var(--font-display); font-weight:800; font-size:16px;">Storyteller</span>
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase;">Fiction</span>
+          </div>
+          <!-- Sunshine cover -->
+          <div class="hero-stack-cover hero-cover-2">
+            <span style="font-family: var(--font-display); font-weight:800; font-size:16px;">Curiosity</span>
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase;">Self-Growth</span>
+          </div>
+          <!-- Mint cover -->
+          <div class="hero-stack-cover hero-cover-3">
+            <span style="font-family: var(--font-display); font-weight:800; font-size:16px;">Wild Hearts</span>
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase;">Classics</span>
+          </div>
+        </div>
+
+        <div class="hero-sticker-badge">
+          <span>Gift a<br>story ✨</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Shop By Shelf -->
+<section id="shelves" class="shelf-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Shop by shelf</h2>
+      <a href="{{ url_for('catalog.shop') }}" class="btn btn-white btn-sm">View all &rarr;</a>
+    </div>
+
+    <div class="shelf-grid">
+      <!-- Fiction -->
+      <a href="{{ url_for('catalog.shop', genre='fiction') }}" class="shelf-tile shelf-tile-fiction">
+        <div class="shelf-caption">Stories that move you</div>
+        <div class="shelf-title">Fiction</div>
+        <div class="shelf-tile-shape shape-arch" style="background-color: var(--sunshine);"></div>
+      </a>
+
+      <!-- Business -->
+      <a href="{{ url_for('catalog.shop', genre='business') }}" class="shelf-tile shelf-tile-business">
+        <div class="shelf-caption">Think bigger, build better</div>
+        <div class="shelf-title">Business</div>
+        <div class="shelf-tile-shape shape-rounded_square" style="background-color: var(--tangerine);"></div>
+      </a>
+
+      <!-- Kids -->
+      <a href="{{ url_for('catalog.shop', genre='kids') }}" class="shelf-tile shelf-tile-kids">
+        <div class="shelf-caption">Imagination unleashed</div>
+        <div class="shelf-title">Kids</div>
+        <div class="shelf-tile-shape shape-circle" style="background-color: var(--violet);"></div>
+      </a>
+
+      <!-- Self-growth -->
+      <a href="{{ url_for('catalog.shop', genre='self-growth') }}" class="shelf-tile shelf-tile-self-growth">
+        <div class="shelf-caption">Habits, mind & wellness</div>
+        <div class="shelf-title">Self-growth</div>
+        <div class="shelf-tile-shape shape-leaf" style="background-color: var(--ink);"></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Fresh off the shelf -->
+<section class="fresh-section" style="padding: 40px 0 60px;">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Fresh off the shelf</h2>
+        <p style="color: var(--muted); margin-top: 6px; font-weight: 500;">Hand-picked new arrivals that we can't stop reading.</p>
+      </div>
+      <a href="{{ url_for('catalog.shop') }}" class="btn btn-white btn-sm">See all books &rarr;</a>
+    </div>
+
+    <div class="books-grid-4">
+      {% for book in fresh_books %}
+        {% include 'partials/book_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Promo Band -->
+<section class="promo-section">
+  <div class="container">
+    <div class="promo-grid">
+      <!-- Bundle Deal -->
+      <div class="promo-card promo-card-tangerine">
+        <div>
+          <span class="promo-tag">Bundle deal</span>
+          <h3 class="promo-title">Read more,<br>spend less.</h3>
+          <p style="font-weight: 500; font-size: 17px; max-width: 380px;">
+            Buy any 3 paperbacks and get 15% off automatically plus complimentary bookmark sets.
+          </p>
+        </div>
+        <div style="margin-top: 32px;">
+          <a href="{{ url_for('catalog.shop') }}" class="btn btn-ink">Shop bundle &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Gift Ready -->
+      <div class="promo-card promo-card-mint">
+        <div>
+          <span class="promo-tag">Gift ready</span>
+          <h3 class="promo-title">Give a story<br>they'll keep.</h3>
+          <p style="font-weight: 500; font-size: 17px; max-width: 380px;">
+            Add luxury gift wrapping and hand-written dedication notes during checkout for just KES 150.
+          </p>
+        </div>
+        <div style="margin-top: 32px;">
+          <a href="{{ url_for('catalog.shop', genre='fiction') }}" class="btn btn-ink">Explore gifts &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Perks Row -->
+<section id="perks" class="perks-section">
+  <div class="container">
+    <div class="perks-grid">
+      <div class="perk-card">
+        <div class="perk-icon-circle" style="background-color: var(--sunshine);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+        </div>
+        <div>
+          <h4 class="perk-title">Pay your way</h4>
+          <p class="perk-desc">Fast card & M-Pesa payments secured by Paystack server-side confirmation.</p>
+        </div>
+      </div>
+
+      <div class="perk-card">
+        <div class="perk-icon-circle" style="background-color: var(--mint);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+        </div>
+        <div>
+          <h4 class="perk-title">Delivered to you</h4>
+          <p class="perk-desc">Carefully packaged and shipped straight to your doorstep throughout Kenya.</p>
+        </div>
+      </div>
+
+      <div class="perk-card">
+        <div class="perk-icon-circle" style="background-color: var(--pink);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+            <rect x="2" y="7" width="20" height="5"></rect>
+            <line x1="12" y1="22" x2="12" y2="7"></line>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="perk-title">Gift wrapping</h4>
+          <p class="perk-desc">Custom packaging, ribbon and personalized cards to surprise someone special.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+  <div class="container">
+    <div class="newsletter-panel">
+      <div class="newsletter-info">
+        <h2>Get book news, first.</h2>
+        <p>Author interviews, weekend reading lists, and exclusive member discounts delivered straight to your inbox.</p>
+      </div>
+
+      <form action="{{ url_for('catalog.newsletter') }}" method="POST" class="newsletter-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="email" name="email" placeholder="Your email address..." required class="newsletter-input" aria-label="Email for newsletter">
+        <button type="submit" class="btn btn-ink">Sign me up</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

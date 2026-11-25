@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 60px 0 100px;">
+  <div class="container" style="max-width: 480px;">
+    <div class="card" style="padding: 44px 36px;">
+      <h1 style="font-size: 38px; margin-bottom: 8px;">Welcome back</h1>
+      <p style="color: var(--muted); margin-bottom: 28px;">Sign in to view your orders, saved addresses and bag.</p>
+
+      <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 700; margin-bottom: 8px;">Email Address</label>
+          <input type="email" name="email" required placeholder="you@example.com" class="newsletter-input" style="width: 100%;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 700; margin-bottom: 8px;">Password</label>
+          <input type="password" name="password" required placeholder="••••••••" class="newsletter-input" style="width: 100%;">
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+            <input type="checkbox" name="remember" style="accent-color: var(--ink);"> Remember me
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-tangerine btn-lg" style="width: 100%;">
+          Sign In
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px; font-size: 15px; color: var(--muted);">
+        Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--violet); font-weight: 700; text-decoration: underline;">Create one</a>
+      </div>
+
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #ddd; font-size: 13px; color: var(--muted); text-align: center;">
+        Demo customer: <code>jane@example.com</code> / <code>secret123</code><br>
+        Demo admin: <code>admin@bookish.co</code> / <code>admin123</code>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

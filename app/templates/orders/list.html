@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 40px 0 80px;">
+  <div class="container" style="max-width: 960px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+      <h1 style="font-size: 52px;">My Orders</h1>
+      <a href="{{ url_for('catalog.shop') }}" class="btn btn-white btn-sm">Shop more &rarr;</a>
+    </div>
+
+    {% if orders %}
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for order in orders %}
+          <div class="card" style="padding: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 16px;">
+              <div>
+                <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700;">Order Reference</div>
+                <div style="font-family: monospace; font-size: 18px; font-weight: 800;">{{ order.reference }}</div>
+                <div style="font-size: 14px; color: var(--muted); margin-top: 4px;">{{ order.created_at.strftime('%b %d, %Y at %H:%M') }}</div>
+              </div>
+
+              <div style="text-align: right;">
+                <div style="font-size: 22px; font-weight: 800; color: var(--violet);">{{ order.total_kes | kes }}</div>
+                <div style="margin-top: 6px;">
+                  <span style="display: inline-block; padding: 4px 12px; border-radius: var(--radius-pill); border: var(--border-ink); font-size: 12px; font-weight: 800; text-transform: uppercase;
+                    {% if order.status == 'paid' %}background-color: var(--mint); color: var(--ink);
+                    {% elif order.status == 'pending' %}background-color: var(--sunshine); color: var(--ink);
+                    {% elif order.status == 'payment_failed' %}background-color: var(--pink); color: var(--ink);
+                    {% elif order.status == 'shipped' %}background-color: var(--blue); color: var(--white);
+                    {% else %}background-color: var(--white); color: var(--ink);{% endif %}">
+                    {{ order.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div style="margin-bottom: 16px;">
+              {% for item in order.items %}
+                <div style="display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 6px;">
+                  <span><strong>{{ item.book.title }}</strong> &times; {{ item.quantity }} ({{ item.format_name }})</span>
+                  <span>{{ item.line_total_kes | kes }}</span>
+                </div>
+              {% endfor %}
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <a href="{{ url_for('orders.detail', reference=order.reference) }}" class="btn btn-ink btn-sm">
+                View Full Details &rarr;
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 80px 20px; background-color: var(--white); border: var(--border-ink); border-radius: var(--radius-card);">
+        <h2 style="font-size: 32px; margin-bottom: 12px;">No orders found</h2>
+        <p style="color: var(--muted); font-size: 18px; margin-bottom: 24px;">You haven't placed any orders with this account yet.</p>
+        <a href="{{ url_for('catalog.shop') }}" class="btn btn-tangerine">Discover books to read</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

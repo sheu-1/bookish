@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Order — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 60px 0 100px;">
+  <div class="container" style="max-width: 500px;">
+    <div class="card" style="padding: 40px;">
+      <h1 style="font-size: 38px; margin-bottom: 12px;">Track your order</h1>
+      <p style="color: var(--muted); margin-bottom: 28px;">Enter your order reference code (e.g. BK-1-...) to view delivery status and details.</p>
+
+      <form method="GET" action="{{ url_for('orders.list_orders') }}">
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-weight: 700; margin-bottom: 8px;">Order Reference</label>
+          <input type="text" name="ref" required placeholder="BK-..." class="newsletter-input" style="width: 100%;">
+        </div>
+
+        <button type="submit" class="btn btn-tangerine btn-lg" style="width: 100%;">
+          Lookup Order
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

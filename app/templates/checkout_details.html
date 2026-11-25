@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Delivery Details — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 40px 0 80px;">
+  <div class="container" style="max-width: 900px;">
+    <h1 style="font-size: 52px; margin-bottom: 32px;">Delivery details</h1>
+
+    <div class="card" style="padding: 40px;">
+      <form action="{{ url_for('payments.checkout_details') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <div>
+            <label style="display: block; font-weight: 700; margin-bottom: 8px;">Recipient Full Name *</label>
+            <input type="text" name="name" required value="{{ form_data.name or '' }}" placeholder="Jane Mwangi" class="newsletter-input" style="width: 100%;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 700; margin-bottom: 8px;">Email Address (for receipt & Paystack) *</label>
+            <input type="email" name="email" required value="{{ form_data.email or '' }}" placeholder="jane@example.com" class="newsletter-input" style="width: 100%;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <div>
+            <label style="display: block; font-weight: 700; margin-bottom: 8px;">Phone Number (for courier / M-Pesa) *</label>
+            <input type="tel" name="phone" required value="{{ form_data.phone or '' }}" placeholder="+254 712 345 678" class="newsletter-input" style="width: 100%;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 700; margin-bottom: 8px;">Town / County / City *</label>
+            <input type="text" name="city" value="Nairobi" class="newsletter-input" style="width: 100%;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 700; margin-bottom: 8px;">Street Address / Building / Apartment *</label>
+          <textarea name="address" required rows="2" placeholder="e.g. Westlands, Apex Towers, 4th Floor, Apt 4B" class="newsletter-input" style="width: 100%; height: auto; padding: 14px; border-radius: 18px;">{{ form_data.address or '' }}</textarea>
+        </div>
+
+        <div style="margin-bottom: 32px;">
+          <label style="display: block; font-weight: 700; margin-bottom: 8px;">Special Delivery Notes (Optional)</label>
+          <textarea name="notes" rows="2" placeholder="e.g. Leave with gate security if not home" class="newsletter-input" style="width: 100%; height: auto; padding: 14px; border-radius: 18px;">{{ form_data.notes or '' }}</textarea>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 20px; border-top: 2px dashed var(--muted); border-opacity: 0.3;">
+          <a href="{{ url_for('cart.view') }}" style="font-weight: 700; color: var(--violet);">&larr; Back to cart</a>
+          <button type="submit" class="btn btn-tangerine btn-lg">
+            <span>Continue to payment &rarr;</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

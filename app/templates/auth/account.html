@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}My Account — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 40px 0 80px;">
+  <div class="container" style="max-width: 900px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+      <div>
+        <span class="hero-pill-tag" style="background-color: var(--sunshine); margin-bottom: 8px;">Reader Profile</span>
+        <h1 style="font-size: 48px;">My Account</h1>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <a href="{{ url_for('orders.list_orders') }}" class="btn btn-white btn-sm">My Orders ({{ orders_count }})</a>
+        <form action="{{ url_for('auth.logout') }}" method="POST" style="display: inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-ink btn-sm">Sign Out</button>
+        </form>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: start;">
+      <!-- Profile Information -->
+      <div class="card" style="padding: 36px;">
+        <h2 style="font-size: 26px; margin-bottom: 20px;">Personal Details</h2>
+        <form action="{{ url_for('auth.account') }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-weight: 700; margin-bottom: 6px;">Full Name</label>
+            <input type="text" name="name" value="{{ current_user.name }}" required class="newsletter-input" style="width: 100%;">
+          </div>
+
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-weight: 700; margin-bottom: 6px;">Email Address</label>
+            <input type="email" value="{{ current_user.email }}" disabled class="newsletter-input" style="width: 100%; opacity: 0.7; cursor: not-allowed; background-color: var(--cream);">
+            <small style="color: var(--muted); font-size: 12px;">Email is linked to your account and payment receipts.</small>
+          </div>
+
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-weight: 700; margin-bottom: 6px;">Phone Number (for Courier &amp; M-Pesa)</label>
+            <input type="tel" name="phone" value="{{ current_user.phone or '' }}" placeholder="+254 712 345 678" class="newsletter-input" style="width: 100%;">
+          </div>
+
+          <div style="margin-bottom: 24px;">
+            <label style="display: block; font-weight: 700; margin-bottom: 6px;">Saved Shipping Address</label>
+            <textarea name="address" rows="2" placeholder="Street, Building, Apartment, City" class="newsletter-input" style="width: 100%; height: auto; padding: 12px; border-radius: 16px;">{{ current_user.address or '' }}</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-tangerine">Save Profile</button>
+        </form>
+      </div>
+
+      <!-- Change Password -->
+      <div>
+        <div class="card" style="padding: 36px; margin-bottom: 28px;">
+          <h2 style="font-size: 24px; margin-bottom: 20px;">Security &amp; Password</h2>
+          <form action="{{ url_for('auth.change_password') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-weight: 700; margin-bottom: 6px;">Current Password</label>
+              <input type="password" name="current_password" required placeholder="••••••••" class="newsletter-input" style="width: 100%;">
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-weight: 700; margin-bottom: 6px;">New Password</label>
+              <input type="password" name="new_password" required minlength="8" placeholder="At least 8 characters" class="newsletter-input" style="width: 100%;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-weight: 700; margin-bottom: 6px;">Confirm New Password</label>
+              <input type="password" name="confirm_password" required minlength="8" placeholder="Repeat new password" class="newsletter-input" style="width: 100%;">
+            </div>
+
+            <button type="submit" class="btn btn-ink btn-sm">Update Password</button>
+          </form>
+        </div>
+
+        <!-- Recent Activity Quick Box -->
+        <div class="card" style="padding: 24px; background-color: var(--mint);">
+          <h3 style="font-size: 20px; margin-bottom: 10px;">Recent Orders</h3>
+          {% if recent_orders %}
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              {% for o in recent_orders %}
+                <a href="{{ url_for('orders.detail', reference=o.reference) }}" style="display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; background: #fff; padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--ink);">
+                  <span style="font-family: monospace;">{{ o.reference }}</span>
+                  <span>{{ o.total_kes | kes }} ({{ o.status }})</span>
+                </a>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="font-size: 14px; font-weight: 600;">No orders placed yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

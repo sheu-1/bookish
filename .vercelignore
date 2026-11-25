@@ -1,0 +1,12 @@
+.env
+instance/
+tests/
+.pytest_cache/
+__pycache__/
+migrations/
+Dockerfile
+.dockerignore
+Procfile
+gunicorn.conf.py
+*.pyc
+.git

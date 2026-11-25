@@ -1,0 +1,40 @@
+:root {
+  /* Colors */
+  --ink: #1B1340;
+  --violet: #6C3BFF;
+  --tangerine: #FF6B35;
+  --sunshine: #FFD23F;
+  --mint: #2EC4A0;
+  --pink: #FF8FB1;
+  --blue: #2F6BFF;
+  --forest: #0E6B56;
+  --cream: #FFF7E8;
+  --white: #FFFFFF;
+  --muted: #5B5480;
+  --lavender-text: #EDE6FF;
+
+  /* Fonts */
+  --font-display: 'Fraunces', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-wordmark: 'Fredoka', cursive, sans-serif;
+
+  /* Borders & Shadows */
+  --border-ink: 2px solid var(--ink);
+  --border-ink-thick: 3px solid var(--ink);
+  --shadow-hard: 4px 4px 0 var(--ink);
+  --shadow-hard-lg: 6px 6px 0 var(--ink);
+  --shadow-hard-sm: 2px 2px 0 var(--ink);
+  --shadow-cover: 0 14px 28px rgba(27, 19, 64, 0.18);
+
+  /* Radius */
+  --radius-pill: 999px;
+  --radius-card: 32px;
+  --radius-hero: 40px;
+  --radius-book: 8px 18px 18px 8px;
+  --radius-sm: 16px;
+
+  /* Spacing */
+  --page-padding-desktop: 64px;
+  --page-padding-mobile: 16px;
+  --section-gap: 88px;
+}

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Order {{ order.reference }} — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 40px 0 80px;">
+  <div class="container" style="max-width: 800px;">
+    <div style="margin-bottom: 24px;">
+      <a href="{{ url_for('orders.list_orders') }}" style="color: var(--violet); font-weight: 700;">&larr; Back to orders</a>
+    </div>
+
+    <div class="card" style="padding: 40px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; border-bottom: 2px dashed var(--muted); border-opacity: 0.3; padding-bottom: 20px;">
+        <div>
+          <span style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">Order Details</span>
+          <h1 style="font-family: monospace; font-size: 32px; margin-top: 4px;">{{ order.reference }}</h1>
+          <div style="color: var(--muted); font-size: 14px; margin-top: 4px;">Placed on {{ order.created_at.strftime('%B %d, %Y at %H:%M UTC') }}</div>
+        </div>
+
+        <div>
+          <span style="display: inline-block; padding: 6px 16px; border-radius: var(--radius-pill); border: var(--border-ink); font-size: 14px; font-weight: 800; text-transform: uppercase; box-shadow: var(--shadow-hard-sm);
+            {% if order.status == 'paid' %}background-color: var(--mint); color: var(--ink);
+            {% elif order.status == 'pending' %}background-color: var(--sunshine); color: var(--ink);
+            {% elif order.status == 'payment_failed' %}background-color: var(--pink); color: var(--ink);
+            {% elif order.status == 'shipped' %}background-color: #2F6BFF; color: var(--white);
+            {% else %}background-color: var(--white); color: var(--ink);{% endif %}">
+            Status: {{ order.status }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Line items -->
+      <h2 style="font-size: 22px; margin-bottom: 16px;">Purchased Items</h2>
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px;">
+        {% for item in order.items %}
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 12px;">
+            <div>
+              <a href="{{ url_for('catalog.product', slug=item.book.slug) }}" style="font-weight: 800; font-size: 17px; color: var(--ink);">
+                {{ item.book.title }}
+              </a>
+              <div style="font-size: 14px; color: var(--muted);">
+                {{ item.format_name }} &times; {{ item.quantity }} @ {{ item.unit_price_kes | kes }}
+              </div>
+            </div>
+            <div style="font-weight: 800; font-size: 18px;">
+              {{ item.line_total_kes | kes }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Breakdown -->
+      <div style="background-color: var(--cream); border: var(--border-ink); border-radius: 20px; padding: 24px; margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span>Delivery Fee:</span>
+          <span>{% if order.delivery_fee_kes == 0 %}FREE{% else %}{{ order.delivery_fee_kes | kes }}{% endif %}</span>
+        </div>
+        {% if order.is_gift %}
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>Gift Packaging:</span>
+            <span>KES 150</span>
+          </div>
+          {% if order.gift_note %}
+            <div style="margin: 8px 0; font-size: 14px; font-style: italic; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd;">
+              "{{ order.gift_note }}"
+            </div>
+          {% endif %}
+        {% endif %}
+        <div style="display: flex; justify-content: space-between; font-size: 22px; font-weight: 800; border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px;">
+          <span>Total:</span>
+          <span style="color: var(--violet);">{{ order.total_kes | kes }}</span>
+        </div>
+      </div>
+
+      <!-- Delivery & Payment verification details -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
+        <div>
+          <h3 style="font-size: 16px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px;">Delivery Details</h3>
+          <p style="font-size: 15px; line-height: 1.5;">
+            <strong>{{ order.delivery_name }}</strong><br>
+            {{ order.delivery_phone }}<br>
+            {{ order.delivery_address }}
+            {% if order.delivery_notes %}<br><em>Note: {{ order.delivery_notes }}</em>{% endif %}
+          </p>
+        </div>
+
+        <div>
+          <h3 style="font-size: 16px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px;">Paystack Verification</h3>
+          {% if order.payment %}
+            <p style="font-size: 14px; line-height: 1.5;">
+              <strong>Provider:</strong> {{ order.payment.provider | capitalize }}<br>
+              <strong>Channel:</strong> {{ order.payment.channel or 'Card/M-Pesa' }}<br>
+              <strong>Status:</strong> Verified ({{ order.payment.status }})<br>
+              <strong>Paid At:</strong> {{ order.payment.paid_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}
+            </p>
+          {% else %}
+            <p style="font-size: 14px; color: var(--muted);">No server-side confirmed payment recorded yet.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if order.status != 'paid' %}
+        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eee;">
+          <a href="{{ url_for('payments.checkout_summary') }}" class="btn btn-tangerine">Complete Payment with Paystack &rarr;</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

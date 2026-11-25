@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} by {{ book.author }} — bookish{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-page-section {
+  padding: 32px 0 80px;
+}
+
+.product-breadcrumb {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 32px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.product-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 56px;
+  align-items: start;
+}
+
+/* Left Showcase Panel (Yellow) */
+.product-showcase-panel {
+  background-color: var(--sunshine);
+  border: var(--border-ink);
+  border-radius: var(--radius-hero);
+  padding: 64px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-hard);
+  min-height: 520px;
+}
+
+.showcase-shape-pink {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background-color: var(--pink);
+  border: var(--border-ink);
+  z-index: 1;
+}
+
+.showcase-shape-mint {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 100px;
+  height: 100px;
+  background-color: var(--mint);
+  border: var(--border-ink);
+  transform: rotate(18deg);
+  border-radius: 20px;
+  z-index: 1;
+}
+
+.product-tilted-cover {
+  max-width: 340px;
+  width: 100%;
+  transform: rotate(-3deg);
+  box-shadow: 0 20px 40px rgba(27, 19, 64, 0.28);
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.product-showcase-panel:hover .product-tilted-cover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+/* Right Content Column */
+.product-info-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-tag-pill {
+  align-self: flex-start;
+  background-color: var(--pink);
+  color: var(--ink);
+  border: var(--border-ink);
+  padding: 5px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.product-h1-title {
+  font-size: 58px;
+  line-height: 1.08;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.product-author-by {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--violet);
+  margin-bottom: 24px;
+}
+
+.product-description-p {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-bottom: 32px;
+}
+
+/* Format Selector */
+.format-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.formats-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.format-card {
+  border: var(--border-ink);
+  border-radius: 20px;
+  padding: 16px;
+  background-color: var(--white);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  user-select: none;
+}
+
+.format-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.format-card.selected {
+  background-color: var(--violet);
+  color: var(--white);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.format-card .f-name {
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.format-card .f-price {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.format-card .f-stock {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* Quantity & Live Total */
+.buy-action-box {
+  background-color: var(--white);
+  border: var(--border-ink);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: var(--shadow-hard);
+  margin-bottom: 32px;
+}
+
+.qty-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: var(--border-ink);
+  border-radius: var(--radius-pill);
+  background-color: var(--cream);
+  overflow: hidden;
+}
+
+.stepper-btn {
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  transition: background-color 0.1s ease;
+}
+
+.stepper-btn:hover {
+  background-color: var(--sunshine);
+}
+
+.stepper-num {
+  width: 48px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.live-total-display {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.add-cart-cta-row {
+  display: flex;
+  gap: 12px;
+}
+
+.add-cart-cta-row .btn-tangerine {
+  flex: 1;
+}
+
+/* Dashed divider and bullets */
+.product-dashed-divider {
+  border-top: 2px dashed var(--muted);
+  opacity: 0.4;
+  margin: 32px 0 24px;
+}
+
+.perks-bullets-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bullet-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.bullet-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--mint);
+  border: 1.5px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .product-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .product-h1-title {
+    font-size: 42px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="product-page-section">
+  <div class="container">
+    <nav class="product-breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ url_for('catalog.home') }}" style="color: var(--ink); opacity: 0.8;">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('catalog.shop', genre=book.category.slug) }}" style="color: var(--ink); opacity: 0.8;">{{ book.category.name }}</a>
+      <span>/</span>
+      <span style="font-weight: 800;">{{ book.title }}</span>
+    </nav>
+
+    <div class="product-layout-grid">
+      <!-- Left Showcase Panel -->
+      <div class="product-showcase-panel">
+        <div class="showcase-shape-pink"></div>
+        <div class="showcase-shape-mint"></div>
+        <div class="product-tilted-cover">
+          {% include 'partials/cover.html' %}
+        </div>
+      </div>
+
+      <!-- Right Info Column -->
+      <div class="product-info-col">
+        {% if book.tag %}
+          <span class="product-tag-pill">{{ book.tag }}</span>
+        {% endif %}
+
+        <h1 class="product-h1-title">{{ book.title }}</h1>
+        <div class="product-author-by">by {{ book.author }}</div>
+
+        <p class="product-description-p">
+          {{ book.description or "A captivating read carefully selected by our editors. Experience rich prose, memorable characters, and unforgettable insights." }}
+        </p>
+
+        <!-- Form for Add to Cart -->
+        <form action="{{ url_for('cart.add') }}" method="POST" id="productAddToCartForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="book_id" value="{{ book.id }}">
+          <input type="hidden" name="variant_id" id="selectedVariantInput" value="{% if book.variants %}{{ book.variants[0].id }}{% endif %}">
+          <input type="hidden" name="quantity" id="quantityInput" value="1">
+
+          <!-- Format Selector -->
+          {% if book.variants %}
+            <div class="format-section-title">Select Format</div>
+            <div class="formats-cards-row" role="radiogroup" aria-label="Book Formats">
+              {% for v in book.variants %}
+                <div class="format-card {% if loop.first %}selected{% endif %}"
+                     tabindex="0"
+                     role="radio"
+                     aria-checked="{% if loop.first %}true{% else %}false{% endif %}"
+                     data-variant-id="{{ v.id }}"
+                     data-price="{{ v.price_kes }}"
+                     onclick="selectFormat(this)">
+                  <div class="f-name">{{ v.format }}</div>
+                  <div class="f-price">{{ v.price_kes | kes }}</div>
+                  <div class="f-stock">{{ v.stock }} in stock</div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Buy Action Box: Stepper + Live Total + Button -->
+          <div class="buy-action-box">
+            <div class="qty-total-row">
+              <div>
+                <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Quantity</div>
+                <div class="qty-stepper">
+                  <button type="button" class="stepper-btn" onclick="changeQty(-1)" aria-label="Decrease quantity">&minus;</button>
+                  <span class="stepper-num" id="stepperDisplay">1</span>
+                  <button type="button" class="stepper-btn" onclick="changeQty(1)" aria-label="Increase quantity">&plus;</button>
+                </div>
+              </div>
+
+              <div style="text-align: right;">
+                <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Total Price</div>
+                <div class="live-total-display" id="liveTotalDisplay">
+                  {% if book.variants %}
+                    {{ book.variants[0].price_kes | kes }}
+                  {% else %}
+                    {{ book.price_kes | kes }}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="add-cart-cta-row">
+              <button type="submit" class="btn btn-tangerine btn-lg">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span>Add to cart</span>
+              </button>
+
+              <button type="button" class="circle-action-btn" style="width: 56px; height: 56px;" aria-label="Save to Wishlist" title="Save to Wishlist" onclick="alert('Saved to your wishlist!')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Perks bullets -->
+        <div class="product-dashed-divider"></div>
+        <ul class="perks-bullets-list">
+          <li class="bullet-item">
+            <div class="bullet-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <span>Pay with M-Pesa or Card securely via Paystack</span>
+          </li>
+          <li class="bullet-item">
+            <div class="bullet-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <span>Delivered quickly to your doorstep across Kenya</span>
+          </li>
+          <li class="bullet-item">
+            <div class="bullet-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <span>Gift-ready options with personalized card notes available in cart</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- More Like This -->
+    {% if similar_books %}
+      <div style="margin-top: 96px;">
+        <div class="section-header">
+          <h2 class="section-title">More like this</h2>
+          <a href="{{ url_for('catalog.shop', genre=book.category.slug) }}" class="btn btn-white btn-sm">Explore {{ book.category.name }} &rarr;</a>
+        </div>
+        <div class="books-grid-4">
+          {% for sb in similar_books %}
+            {% with book=sb %}
+              {% include 'partials/book_card.html' %}
+            {% endwith %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPrice = {% if book.variants %}{{ book.variants[0].price_kes }}{% else %}{{ book.price_kes }}{% endif %};
+let currentQty = 1;
+
+function selectFormat(el) {
+  document.querySelectorAll('.format-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-checked', 'false');
+  });
+  el.classList.add('selected');
+  el.setAttribute('aria-checked', 'true');
+
+  const variantId = el.getAttribute('data-variant-id');
+  currentPrice = parseInt(el.getAttribute('data-price'), 10);
+  document.getElementById('selectedVariantInput').value = variantId;
+  updateTotal();
+}
+
+function changeQty(delta) {
+  currentQty = Math.max(1, Math.min(9, currentQty + delta));
+  document.getElementById('stepperDisplay').textContent = currentQty;
+  document.getElementById('quantityInput').value = currentQty;
+  updateTotal();
+}
+
+function updateTotal() {
+  const total = currentPrice * currentQty;
+  document.getElementById('liveTotalDisplay').textContent = 'KES ' + total.toLocaleString();
+}
+</script>
+{% endblock %}

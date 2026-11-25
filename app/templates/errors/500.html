@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Something Went Wrong — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 80px 0 120px; text-align: center;">
+  <div class="container" style="max-width: 600px;">
+    <div class="card" style="padding: 56px 40px;">
+      <span class="hero-pill-tag" style="background-color: var(--pink); margin-bottom: 16px;">500 Server Error</span>
+      <h1 style="font-size: 48px; margin-bottom: 16px;">Something went wrong</h1>
+      <p style="color: var(--muted); font-size: 18px; margin-bottom: 32px;">
+        Our team has been notified. Please try refreshing the page or check back in a moment.
+      </p>
+      <a href="{{ url_for('catalog.home') }}" class="btn btn-tangerine btn-lg">Back to Home</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

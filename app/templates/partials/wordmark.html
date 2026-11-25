@@ -1,0 +1,20 @@
+{# Wordmark Partial: SVG / CSS 7 letters with outlines, colors and bubbles #}
+<a href="{{ url_for('catalog.home') }}" class="wordmark-wrap {% if dark %}dark-theme{% endif %} {% if size %}wordmark-{{ size }}{% endif %}" role="img" aria-label="bookish">
+  <div class="logo-icon-box" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFD23F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </svg>
+  </div>
+  <div class="wordmark-letters" aria-hidden="true">
+    <span class="letter letter-b">b</span>
+    <span class="letter letter-o1">o</span>
+    <span class="letter letter-o2">o</span>
+    <span class="letter letter-k">k</span>
+    <span class="letter letter-i">i</span>
+    <span class="letter letter-s">s</span>
+    <span class="letter letter-h">h</span>
+    <span class="bubble bubble-1"></span>
+    <span class="bubble bubble-2"></span>
+  </div>
+</a>

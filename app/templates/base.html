@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}bookish — Bright, Joyful Reads{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sections.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Announcement bar -->
+  <aside class="announcement-bar" role="region" aria-label="Announcement">
+    <span>✨ Free standard delivery on all orders over KES 2,500! · Read more, spend less ✨</span>
+  </aside>
+
+  <!-- Global Header -->
+  <header class="site-header">
+    <div class="header-row">
+      <!-- Left: Logo + Wordmark -->
+      <div class="header-brand">
+        {% include 'partials/wordmark.html' %}
+      </div>
+
+      <!-- Center: Nav Pills -->
+      <nav class="header-nav" aria-label="Main Navigation">
+        <ul class="nav-pills">
+          <li><a href="{{ url_for('catalog.shop') }}" class="nav-pill {% if request.path == url_for('catalog.shop') and not request.args.get('genre') %}active{% endif %}">Shop</a></li>
+          <li><a href="{{ url_for('catalog.shop', genre='fiction') }}" class="nav-pill {% if request.args.get('genre') == 'fiction' %}active{% endif %}">Fiction</a></li>
+          <li><a href="{{ url_for('catalog.shop', genre='business') }}" class="nav-pill {% if request.args.get('genre') == 'business' %}active{% endif %}">Business</a></li>
+          <li><a href="{{ url_for('catalog.shop', genre='kids') }}" class="nav-pill {% if request.args.get('genre') == 'kids' %}active{% endif %}">Kids</a></li>
+          <li><a href="{{ url_for('catalog.shop', genre='self-growth') }}" class="nav-pill {% if request.args.get('genre') == 'self-growth' %}active{% endif %}">Self-growth</a></li>
+        </ul>
+      </nav>
+
+      <!-- Right: Search pill & Action buttons -->
+      <div class="header-actions">
+        <form action="{{ url_for('catalog.shop') }}" method="GET" class="search-pill-form" role="search">
+          <input type="text" name="q" placeholder="Search books, authors..." value="{{ request.args.get('q', '') }}" class="search-pill-input" aria-label="Search bookstore">
+          <button type="submit" class="search-pill-btn" aria-label="Submit search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </form>
+
+        {% if current_user.is_authenticated %}
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('admin.dashboard') }}" class="circle-action-btn" aria-label="Admin Dashboard" title="Admin Dashboard" style="background-color: var(--sunshine);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </a>
+          {% endif %}
+          <a href="{{ url_for('auth.account') }}" class="circle-action-btn" aria-label="My Account" title="My Account">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="circle-action-btn" aria-label="Sign In" title="Sign In">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </a>
+        {% endif %}
+
+        <!-- Cart Circle (tangerine) with ink count badge -->
+        <a href="{{ url_for('cart.view') }}" class="circle-action-btn cart-btn" aria-label="Shopping Bag">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="cart-badge">{{ cart_count }}</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  <div class="container flash-messages-wrap">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-weight:800; font-size:18px;">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Page Content -->
+  <main id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          {% include 'partials/wordmark.html' %}
+          <p>Bright, joyful reads delivered to your doorstep across Kenya. Built for avid readers and thoughtful gifters.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="{{ url_for('catalog.shop') }}">All Books</a></li>
+            <li><a href="{{ url_for('catalog.shop', genre='fiction') }}">Fiction</a></li>
+            <li><a href="{{ url_for('catalog.shop', genre='business') }}">Business & Money</a></li>
+            <li><a href="{{ url_for('catalog.shop', genre='kids') }}">Kids & Youth</a></li>
+            <li><a href="{{ url_for('catalog.shop', genre='self-growth') }}">Self-growth</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Account & Help</h4>
+          <ul>
+            {% if current_user.is_authenticated %}
+              <li><a href="{{ url_for('auth.account') }}">My Account</a></li>
+              <li><a href="{{ url_for('orders.list_orders') }}">My Orders</a></li>
+              {% if current_user.is_admin %}
+                <li><a href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a></li>
+              {% endif %}
+              <li>
+                <form action="{{ url_for('auth.logout') }}" method="POST" style="display:inline;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" style="background:none; border:none; color:inherit; cursor:pointer; font-weight:500; font-size:15px; padding:0;">Sign Out</button>
+                </form>
+              </li>
+            {% else %}
+              <li><a href="{{ url_for('auth.login') }}">Sign In</a></li>
+              <li><a href="{{ url_for('auth.register') }}">Create Account</a></li>
+              <li><a href="{{ url_for('orders.list_orders') }}">Track Order</a></li>
+            {% endif %}
+            <li><a href="#perks">Shipping & Delivery</a></li>
+            <li><a href="#perks">Paystack / M-Pesa Security</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Follow</h4>
+          <ul>
+            <li><a href="#" target="_blank" rel="noopener">Instagram (@bookish)</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Twitter / X</a></li>
+            <li><a href="#" target="_blank" rel="noopener">TikTok Books</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Goodreads Club</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 bookish Ltd. All rights reserved. Prices in KES.</div>
+        <div>Payments verified server-side with Paystack (M-Pesa & Card).</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="mobile-bottom-tabs" aria-label="Mobile Navigation">
+    <a href="{{ url_for('catalog.home') }}" class="mobile-tab-item {% if request.path == url_for('catalog.home') %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Home</span>
+    </a>
+    <a href="{{ url_for('catalog.shop') }}" class="mobile-tab-item {% if request.path == url_for('catalog.shop') %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      <span>Shop</span>
+    </a>
+    <a href="{{ url_for('orders.list_orders') if current_user.is_authenticated else url_for('auth.login') }}" class="mobile-tab-item {% if 'order' in request.path or 'auth' in request.path %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span>Account</span>
+    </a>
+    <a href="{{ url_for('cart.view') }}" class="mobile-tab-item {% if request.path == url_for('cart.view') %}active{% endif %}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <path d="M16 10a4 4 0 0 1-8 0"></path>
+      </svg>
+      <span>Cart ({{ cart_count }})</span>
+    </a>
+  </nav>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
