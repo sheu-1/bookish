@@ -17,6 +17,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .product-layout-grid {
@@ -85,26 +86,45 @@
   flex-direction: column;
 }
 
-.product-tag-pill {
-  align-self: flex-start;
-  background-color: var(--pink);
-  color: var(--ink);
+.product-badges-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.product-category-pill {
+  background-color: var(--violet);
+  color: var(--white);
   border: var(--border-ink);
-  padding: 5px 16px;
+  padding: 5px 14px;
   border-radius: var(--radius-pill);
   font-size: 13px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 16px;
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.product-tag-pill {
+  background-color: var(--pink);
+  color: var(--ink);
+  border: var(--border-ink);
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   box-shadow: var(--shadow-hard-sm);
 }
 
 .product-h1-title {
-  font-size: 58px;
+  font-size: 52px;
   line-height: 1.08;
   color: var(--ink);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .product-author-by {
@@ -114,11 +134,35 @@
   margin-bottom: 24px;
 }
 
-.product-description-p {
-  font-size: 18px;
-  line-height: 1.65;
+/* Book Summary Box */
+.book-summary-box {
+  background-color: var(--white);
+  border: var(--border-ink);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.summary-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.summary-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
   color: var(--ink);
-  margin-bottom: 32px;
+}
+
+.summary-body-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-line;
 }
 
 /* Format Selector */
@@ -135,7 +179,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .format-card {
@@ -253,7 +297,7 @@
 .product-dashed-divider {
   border-top: 2px dashed var(--muted);
   opacity: 0.4;
-  margin: 32px 0 24px;
+  margin: 28px 0 24px;
 }
 
 .perks-bullets-list {
@@ -289,7 +333,7 @@
     grid-template-columns: 1fr;
   }
   .product-h1-title {
-    font-size: 42px;
+    font-size: 38px;
   }
 }
 </style>
@@ -318,16 +362,24 @@
 
       <!-- Right Info Column -->
       <div class="product-info-col">
-        {% if book.tag %}
-          <span class="product-tag-pill">{{ book.tag }}</span>
-        {% endif %}
+        <div class="product-badges-row">
+          <span class="product-category-pill">{{ book.category.name }}</span>
+          {% if book.tag %}
+            <span class="product-tag-pill">{{ book.tag }}</span>
+          {% endif %}
+        </div>
 
         <h1 class="product-h1-title">{{ book.title }}</h1>
         <div class="product-author-by">by {{ book.author }}</div>
 
-        <p class="product-description-p">
-          {{ book.description or "A captivating read carefully selected by our editors. Experience rich prose, memorable characters, and unforgettable insights." }}
-        </p>
+        <!-- Comprehensive Book Summary & Synopsis Box -->
+        <div class="book-summary-box">
+          <div class="summary-header-row">
+            <span style="font-size: 20px;">📖</span>
+            <h3 class="summary-title">Book Summary &amp; Synopsis</h3>
+          </div>
+          <div class="summary-body-text">{{ book.description }}</div>
+        </div>
 
         <!-- Form for Add to Cart -->
         <form action="{{ url_for('cart.add') }}" method="POST" id="productAddToCartForm">

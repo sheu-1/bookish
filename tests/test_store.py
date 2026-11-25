@@ -250,6 +250,47 @@ def test_admin_dashboard_and_controls(client):
     assert b"Admin Dashboard" in res.data
     assert b"Store Operations" in res.data
 
+    # Test adding a new book
+    cat = Category.query.first()
+    res_add = client.post("/admin/books/new", data={
+        "title": "Zero to One",
+        "author": "Peter Thiel",
+        "category_id": cat.id,
+        "price_kes": 1750,
+        "stock": 15,
+        "description": "Notes on startups, or how to build the future.",
+        "cover_bg": "#FF6B35",
+        "cover_shape": "arch",
+    }, follow_redirects=True)
+    assert res_add.status_code == 200
+    assert b"Zero to One" in res_add.data
+
+    new_book = Book.query.filter_by(slug="zero-to-one").first()
+    assert new_book is not None
+    assert new_book.price_kes == 1750
+
+    # Test editing book
+    res_edit = client.post(f"/admin/books/{new_book.id}/edit", data={
+        "title": "Zero to One (Revised)",
+        "author": "Peter Thiel & Blake Masters",
+        "category_id": cat.id,
+        "price_kes": 1900,
+        "stock": 25,
+        "description": "Updated notes on building companies.",
+        "cover_bg": "#FF6B35",
+        "cover_shape": "arch",
+        "is_active": "on",
+    }, follow_redirects=True)
+    assert res_edit.status_code == 200
+    db.session.refresh(new_book)
+    assert new_book.title == "Zero to One (Revised)"
+    assert new_book.stock == 25
+
+    # Test deleting book
+    res_del = client.post(f"/admin/books/{new_book.id}/delete", follow_redirects=True)
+    assert res_del.status_code == 200
+    assert Book.query.filter_by(id=new_book.id).first() is None
+
 def test_user_account_management(client):
     # Sign in as customer
     client.post("/login", data={

@@ -1,9 +1,15 @@
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from app.extensions import db
-from app.models import Book, Order, User, Category
+from app.models import Book, BookVariant, Order, User, Category
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
+
+def slugify(text):
+    text = text.lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    return re.sub(r'[-\s]+', '-', text)
 
 @bp.before_request
 @login_required
@@ -16,8 +22,9 @@ def dashboard():
     total_orders = Order.query.count()
     paid_orders = Order.query.filter_by(status="paid").count()
     total_revenue = db.session.query(db.func.sum(Order.total_kes)).filter_by(status="paid").scalar() or 0
-    recent_orders = Order.query.order_by(Order.created_at.desc()).limit(10).all()
+    recent_orders = Order.query.order_by(Order.created_at.desc()).limit(15).all()
     books = Book.query.order_by(Book.created_at.desc()).all()
+    categories = Category.query.all()
     users_count = User.query.count()
 
     return render_template(
@@ -27,8 +34,105 @@ def dashboard():
         total_revenue=total_revenue,
         recent_orders=recent_orders,
         books=books,
+        categories=categories,
         users_count=users_count,
     )
+
+@bp.route("/books/new", methods=["GET", "POST"])
+def new_book():
+    categories = Category.query.all()
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        author = request.form.get("author", "").strip()
+        category_id = request.form.get("category_id", type=int)
+        price_kes = request.form.get("price_kes", type=int)
+        stock = request.form.get("stock", 10, type=int)
+        description = request.form.get("description", "").strip()
+        cover_image = request.form.get("cover_image", "").strip()
+        tag = request.form.get("tag", "").strip() or None
+        cover_bg = request.form.get("cover_bg", "#6C3BFF").strip()
+        cover_shape = request.form.get("cover_shape", "circle").strip()
+
+        if not title or not author or not category_id or not price_kes:
+            flash("Please fill in Title, Author, Category, and Price.", "error")
+            return render_template("admin/book_form.html", categories=categories, book=None)
+
+        # Generate unique slug
+        base_slug = slugify(title)
+        slug = base_slug
+        counter = 1
+        while Book.query.filter_by(slug=slug).first():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        book = Book(
+            title=title,
+            slug=slug,
+            author=author,
+            category_id=category_id,
+            price_kes=price_kes,
+            stock=stock,
+            description=description,
+            cover_image=cover_image or None,
+            tag=tag,
+            cover_bg=cover_bg,
+            cover_shape=cover_shape,
+            is_active=True,
+        )
+        db.session.add(book)
+        db.session.flush()
+
+        # Add default paperback variant
+        variant = BookVariant(
+            book_id=book.id,
+            format="Paperback",
+            price_kes=price_kes,
+            stock=stock,
+        )
+        db.session.add(variant)
+        db.session.commit()
+
+        flash(f"Book '{book.title}' created successfully!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/book_form.html", categories=categories, book=None)
+
+@bp.route("/books/<int:book_id>/edit", methods=["GET", "POST"])
+def edit_book(book_id):
+    book = db.session.get(Book, book_id)
+    if not book:
+        abort(404)
+
+    categories = Category.query.all()
+    if request.method == "POST":
+        book.title = request.form.get("title", "").strip()
+        book.author = request.form.get("author", "").strip()
+        book.category_id = request.form.get("category_id", type=int)
+        book.price_kes = request.form.get("price_kes", type=int)
+        book.stock = request.form.get("stock", type=int)
+        book.description = request.form.get("description", "").strip()
+        book.cover_image = request.form.get("cover_image", "").strip() or None
+        book.tag = request.form.get("tag", "").strip() or None
+        book.cover_bg = request.form.get("cover_bg", "#6C3BFF").strip()
+        book.cover_shape = request.form.get("cover_shape", "circle").strip()
+        book.is_active = request.form.get("is_active") == "on"
+
+        db.session.commit()
+        flash(f"Book '{book.title}' updated successfully!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/book_form.html", categories=categories, book=book)
+
+@bp.post("/books/<int:book_id>/delete")
+def delete_book(book_id):
+    book = db.session.get(Book, book_id)
+    if not book:
+        abort(404)
+    title = book.title
+    db.session.delete(book)
+    db.session.commit()
+    flash(f"Book '{title}' was deleted from the store.", "info")
+    return redirect(url_for("admin.dashboard"))
 
 @bp.post("/orders/<int:order_id>/status")
 def update_order_status(order_id):
@@ -40,7 +144,7 @@ def update_order_status(order_id):
     if new_status in allowed:
         order.status = new_status
         db.session.commit()
-        flash(f"Order #{order.id} status updated to {new_status}.", "success")
+        flash(f"Order #{order.id} status updated to '{new_status}'.", "success")
     return redirect(url_for("admin.dashboard"))
 
 @bp.post("/books/<int:book_id>/stock")
