@@ -226,19 +226,7 @@ ON CONFLICT (slug) DO UPDATE SET
     cover_shape = EXCLUDED.cover_shape,
     tag = EXCLUDED.tag;
 
--- Book Variants (Paperback / Hardcover / eBook for each book)
-DO $$
-DECLARE
-    book_rec RECORD;
-BEGIN
-    FOR book_rec IN SELECT id, price_kes FROM books LOOP
-        INSERT INTO book_variants (book_id, format, price_kes, stock) VALUES
-            (book_rec.id, 'Paperback', book_rec.price_kes, 20),
-            (book_rec.id, 'Hardcover', book_rec.price_kes + 400, 10),
-            (book_rec.id, 'eBook', GREATEST(book_rec.price_kes - 300, 500), 999)
-        ON CONFLICT DO NOTHING;
-    END LOOP;
-END $$;
+-- Note: Book formats (Paperback / Hardcover / eBook) are optional and can be added manually in the Admin Dashboard.
 
 -- Demo Users (passwords: secret123 and admin123)
 -- These are werkzeug scrypt hashes — they work with Flask-Login's check_password_hash

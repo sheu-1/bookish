@@ -100,6 +100,31 @@
           </div>
         {% endif %}
 
+        <!-- Optional Book Formats -->
+        <div style="margin-bottom: 28px; padding: 20px; background-color: var(--cream); border: var(--border-ink); border-radius: 16px;">
+          <input type="hidden" name="formats_submitted" value="1">
+          <label style="display: block; font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 4px;">Book Formats (Optional)</label>
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">Leave unchecked to sell as a single standard edition at the base price. Check any formats below if you want to offer options.</p>
+          {% set existing_formats = {} %}
+          {% if book and book.variants %}
+            {% for v in book.variants %}
+              {% set _ = existing_formats.update({v.format: v.price_kes}) %}
+            {% endfor %}
+          {% endif %}
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            {% for fmt in ['Paperback', 'Hardcover', 'eBook'] %}
+              <div style="background: #fff; border: 1.5px solid var(--ink); border-radius: 12px; padding: 12px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 700; cursor: pointer; margin-bottom: 8px;">
+                  <input type="checkbox" name="formats" value="{{ fmt }}" {% if fmt in existing_formats %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--violet);">
+                  <span>{{ fmt }}</span>
+                </label>
+                <input type="number" name="price_{{ fmt }}" value="{{ existing_formats.get(fmt, '') }}" placeholder="Price (KES)" min="100"
+                       style="width: 100%; padding: 6px 10px; border: 1.5px solid #ccc; border-radius: 8px; font-size: 13px;">
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
         <div style="display: flex; gap: 12px;">
           <button type="submit" class="btn btn-tangerine btn-lg" style="flex: 1;">
             {% if book %}Save Changes{% else %}Create Book{% endif %}

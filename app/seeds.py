@@ -405,15 +405,6 @@ def seed_data():
             )
             db.session.add(book)
             db.session.flush()
-
-            for var_format, var_price, var_stock in b_data.get("variants", []):
-                variant = BookVariant(
-                    book_id=book.id,
-                    format=var_format,
-                    price_kes=var_price,
-                    stock=var_stock,
-                )
-                db.session.add(variant)
         else:
             # Update category, description, pricing, and active status
             book.category_id = cat.id
@@ -423,10 +414,6 @@ def seed_data():
             book.is_active = True
             if b_data.get("cover_image"):
                 book.cover_image = b_data["cover_image"]
-
-            # Synchronize variants prices
-            for v in book.variants:
-                v.price_kes = b_data["price_kes"]
 
     db.session.commit()
 

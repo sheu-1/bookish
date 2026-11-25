@@ -82,14 +82,20 @@ def new_book():
         db.session.add(book)
         db.session.flush()
 
-        # Add default paperback variant
-        variant = BookVariant(
-            book_id=book.id,
-            format="Paperback",
-            price_kes=price_kes,
-            stock=stock,
-        )
-        db.session.add(variant)
+        # Optional formats: only add if admin explicitly checked/entered them
+        selected_formats = request.form.getlist("formats")
+        for fmt in selected_formats:
+            fmt_name = fmt.strip()
+            if fmt_name:
+                fmt_price = request.form.get(f"price_{fmt_name}", type=int) or price_kes
+                variant = BookVariant(
+                    book_id=book.id,
+                    format=fmt_name,
+                    price_kes=fmt_price,
+                    stock=stock,
+                )
+                db.session.add(variant)
+
         db.session.commit()
 
         flash(f"Book '{book.title}' created successfully!", "success")
@@ -116,6 +122,27 @@ def edit_book(book_id):
         book.cover_bg = request.form.get("cover_bg", "#6C3BFF").strip()
         book.cover_shape = request.form.get("cover_shape", "circle").strip()
         book.is_active = request.form.get("is_active") == "on"
+
+        # Optional formats update
+        if "formats_submitted" in request.form:
+            selected_formats = [f.strip() for f in request.form.getlist("formats") if f.strip()]
+            existing_by_fmt = {v.format: v for v in book.variants}
+            # Remove unchecked formats
+            for fmt, var in list(existing_by_fmt.items()):
+                if fmt not in selected_formats:
+                    db.session.delete(var)
+            # Add or update checked formats
+            for fmt in selected_formats:
+                fmt_price = request.form.get(f"price_{fmt}", type=int) or book.price_kes
+                if fmt in existing_by_fmt:
+                    existing_by_fmt[fmt].price_kes = fmt_price
+                else:
+                    db.session.add(BookVariant(
+                        book_id=book.id,
+                        format=fmt,
+                        price_kes=fmt_price,
+                        stock=book.stock,
+                    ))
 
         db.session.commit()
         flash(f"Book '{book.title}' updated successfully!", "success")

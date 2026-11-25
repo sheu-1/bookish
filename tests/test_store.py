@@ -58,17 +58,14 @@ def test_product_detail(client):
     assert res.status_code == 200
     assert b"Atomic Habits" in res.data
     assert b"James Clear" in res.data
-    assert b"Paperback" in res.data
-    assert b"Hardcover" in res.data
+    assert b"1,950" in res.data
 
 def test_cart_workflow(client):
     book = Book.query.filter_by(slug="atomic-habits").first()
-    variant = book.variants[0]
 
     # 1. Add to cart
     res = client.post("/cart/add", data={
         "book_id": book.id,
-        "variant_id": variant.id,
         "quantity": 2,
     }, follow_redirects=True)
     assert res.status_code == 200
