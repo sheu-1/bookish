@@ -71,15 +71,20 @@ def add():
 
     db.session.commit()
 
+    if request.form.get("checkout"):
+        return redirect(url_for("payments.checkout_details"))
+
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return jsonify({
             "status": "success",
             "message": f"Added '{book.title}' to your bag!",
             "cart_count": cart.total_items,
+            "checkout_url": url_for("payments.checkout_details"),
+            "cart_url": url_for("cart.view"),
         })
 
     flash(f"Added '{book.title}' to your bag!", "success")
-    return redirect(request.referrer or url_for("cart.view"))
+    return redirect(url_for("cart.view"))
 
 @bp.post("/update")
 def update():

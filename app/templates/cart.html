@@ -278,8 +278,11 @@
             </form>
           </div>
 
-          <div style="margin-top: 32px;">
+          <div style="margin-top: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
             <a href="{{ url_for('catalog.shop') }}" style="font-weight:700; color:var(--violet); text-decoration:underline;">&larr; Keep browsing books</a>
+            <a href="{{ url_for('payments.checkout_details') }}" class="btn btn-tangerine btn-sm">
+              <span>Proceed to checkout &rarr;</span>
+            </a>
           </div>
         </div>
 

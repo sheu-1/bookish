@@ -90,8 +90,13 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">
-            <span>{{ message }}</span>
+          <div class="alert alert-{{ category }}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span>{{ message }}</span>
+              {% if 'bag' in message or 'cart' in message %}
+                <a href="{{ url_for('payments.checkout_details') }}" class="btn btn-tangerine btn-sm" style="padding: 4px 14px; font-size: 13px; font-weight: 800;">Proceed to Checkout &rarr;</a>
+              {% endif %}
+            </div>
             <button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer; font-weight:800; font-size:18px;">&times;</button>
           </div>
         {% endfor %}
