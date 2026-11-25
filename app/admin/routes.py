@@ -141,7 +141,22 @@ def update_order_status(order_id):
         abort(404)
     new_status = request.form.get("status")
     allowed = ["pending", "paid", "payment_failed", "shipped", "delivered", "cancelled"]
-    if new_status in allowed:
+    if new_status in allowed and new_status != order.status:
+        # If moving from paid to cancelled, restore the stock
+        if order.status in ("paid", "shipped", "delivered") and new_status in ("cancelled", "payment_failed"):
+            for item in order.items:
+                if item.variant:
+                    item.variant.stock += item.quantity
+                if item.book:
+                    item.book.stock += item.quantity
+        # If moving manually to paid, deduct stock
+        elif order.status not in ("paid", "shipped", "delivered") and new_status == "paid":
+            for item in order.items:
+                if item.variant:
+                    item.variant.stock = max(0, item.variant.stock - item.quantity)
+                if item.book:
+                    item.book.stock = max(0, item.book.stock - item.quantity)
+
         order.status = new_status
         db.session.commit()
         flash(f"Order #{order.id} status updated to '{new_status}'.", "success")
@@ -152,9 +167,28 @@ def update_stock(book_id):
     book = db.session.get(Book, book_id)
     if not book:
         abort(404)
+
+    add_stock = request.form.get("add_stock", type=int)
     new_stock = request.form.get("stock", type=int)
-    if new_stock is not None and new_stock >= 0:
+
+    if add_stock is not None and add_stock > 0:
+        book.stock += add_stock
+        if book.variants:
+            for v in book.variants:
+                v.stock += add_stock
+        msg = f"Restocked: Added {add_stock} units to '{book.title}'. Total stock: {book.stock}."
+    elif new_stock is not None and new_stock >= 0:
         book.stock = new_stock
-        db.session.commit()
-        flash(f"Stock for '{book.title}' updated to {new_stock}.", "success")
+        if book.variants:
+            for v in book.variants:
+                v.stock = new_stock
+        msg = f"Stock for '{book.title}' set to {new_stock}."
+    else:
+        msg = "No stock changes made."
+
+    if book.stock > 0:
+        book.is_active = True
+
+    db.session.commit()
+    flash(msg, "success")
     return redirect(url_for("admin.dashboard"))

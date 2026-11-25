@@ -92,10 +92,11 @@
                 </td>
                 <td style="padding: 12px 8px; font-weight: 700;">{{ b.price_kes | kes }}</td>
                 <td style="padding: 12px 8px;">
-                  <form action="{{ url_for('admin.update_stock', book_id=b.id) }}" method="POST" style="display: inline-flex; gap: 6px; align-items: center;">
+                  <form action="{{ url_for('admin.update_stock', book_id=b.id) }}" method="POST" style="display: inline-flex; gap: 4px; align-items: center;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="number" name="stock" value="{{ b.stock }}" min="0" style="width: 65px; padding: 4px 8px; border-radius: 8px; border: 1.5px solid var(--ink); font-weight: 700;">
-                    <button type="submit" class="btn btn-ink btn-sm" style="padding: 4px 8px; font-size: 11px;">Update</button>
+                    <input type="number" name="stock" value="{{ b.stock }}" min="0" style="width: 60px; padding: 4px 6px; border-radius: 8px; border: 1.5px solid var(--ink); font-weight: 700;">
+                    <button type="submit" class="btn btn-ink btn-sm" style="padding: 4px 8px; font-size: 11px;">Set</button>
+                    <button type="submit" name="add_stock" value="10" class="btn btn-sunshine btn-sm" style="padding: 4px 8px; font-size: 11px; font-weight: 700;" title="Restock +10 units">+10</button>
                   </form>
                 </td>
                 <td style="padding: 12px 8px;">

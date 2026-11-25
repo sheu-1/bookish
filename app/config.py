@@ -38,8 +38,8 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(days=14)
 
     # Paystack Settings
-    PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY", "pk_test_bookish_placeholder")
-    PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "sk_test_bookish_placeholder")
+    PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY") or os.getenv("EXPO_PUBLIC_PAYSTACK_PUBLIC_KEY") or "pk_test_bookish_placeholder"
+    PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY") or os.getenv("EXPO_PUBLIC_PAYSTACK_SECRET_KEY") or "sk_test_bookish_placeholder"
     SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1:5000")
     PAYSTACK_MOCK_ENABLED = os.getenv("PAYSTACK_MOCK_ENABLED", "false").lower() in ("true", "1", "yes")
 

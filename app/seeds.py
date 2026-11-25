@@ -22,7 +22,8 @@ def seed_data():
     # 2. Categories with explicit, clear naming
     categories_data = [
         {"name": "Fiction", "slug": "fiction", "colour_token": "violet"},
-        {"name": "Business & Finance", "slug": "business", "colour_token": "sunshine"},
+        {"name": "Finance & Business", "slug": "business", "colour_token": "sunshine"},
+        {"name": "Programming & Tech", "slug": "programming", "colour_token": "mint"},
         {"name": "Kids & Young Readers", "slug": "kids", "colour_token": "pink"},
         {"name": "Self-growth", "slug": "self-growth", "colour_token": "mint"},
         {"name": "Romance", "slug": "romance", "colour_token": "pink"},
@@ -44,6 +45,185 @@ def seed_data():
 
     # 3. Sample Books matching the design canvas and spec with rich summaries
     sample_books = [
+        # --- FINANCIAL BOOKS (Priced at 200 KES) ---
+        {
+            "title": "The Psychology of Money",
+            "slug": "the-psychology-of-money",
+            "author": "Morgan Housel",
+            "description": "Doing well with money is not simply about mathematics or financial equations—it is about how you behave. In The Psychology of Money, Morgan Housel shares 19 short, captivating stories exploring the strange ways humans perceive wealth, risk, ego, and happiness.\n\nYou will learn why financial freedom is really about sleeping well at night, how compounding works in the real world, and why keeping money requires humility while making money requires risk. A modern finance classic for every investor.",
+            "category": "business",
+            "price_kes": 200,
+            "stock": 25,
+            "tag": "Bestseller",
+            "cover_image": "/static/img/covers/the-psychology-of-money.jpg",
+            "cover_bg": "#FFD23F",       # sunshine
+            "cover_fg": "#1B1340",
+            "cover_accent": "#FF6B35",   # tangerine
+            "cover_shape": "rounded_square",
+            "variants": [
+                ("Paperback", 200, 25),
+                ("Hardcover", 200, 10),
+                ("eBook", 200, 100),
+            ]
+        },
+        {
+            "title": "Rich Dad Poor Dad",
+            "slug": "rich-dad-poor-dad",
+            "author": "Robert T. Kiyosaki",
+            "description": "What the rich teach their kids about money that the poor and middle class do not! Explodes the myth that you need to earn a high income to be rich and explains the difference between working for money and having your money work for you.",
+            "category": "business",
+            "price_kes": 200,
+            "stock": 30,
+            "tag": "Bestseller",
+            "cover_image": None,
+            "cover_bg": "#2EC4A0",       # mint
+            "cover_fg": "#1B1340",
+            "cover_accent": "#FFD23F",   # sunshine
+            "cover_shape": "circle",
+            "variants": [
+                ("Paperback", 200, 20),
+                ("Hardcover", 200, 10),
+                ("eBook", 200, 100),
+            ]
+        },
+        {
+            "title": "The Intelligent Investor",
+            "slug": "the-intelligent-investor",
+            "author": "Benjamin Graham",
+            "description": "The definitive book on value investing. Benjamin Graham's philosophy of 'value investing' shields investors from substantial error and teaches them to develop long-term strategies that have made this book an investment bible.",
+            "category": "business",
+            "price_kes": 200,
+            "stock": 20,
+            "tag": "Staff pick",
+            "cover_image": None,
+            "cover_bg": "#0E6B56",       # forest
+            "cover_fg": "#FFFFFF",
+            "cover_accent": "#FFD23F",   # sunshine
+            "cover_shape": "leaf",
+            "variants": [
+                ("Paperback", 200, 15),
+                ("Hardcover", 200, 5),
+            ]
+        },
+        {
+            "title": "Build: An Unorthodox Guide to Making Things Worth Making",
+            "slug": "build-tony-fadell",
+            "author": "Tony Fadell",
+            "description": "Tony Fadell led the teams that created the iPod, the iPhone, and the Nest Learning Thermostat. Build delivers pragmatic mentorship forged across thirty-plus years in Silicon Valley.\n\nFrom handling workplace conflict and choosing startup co-founders to product design principles that thrill customers, this is the definitive playbook for makers, managers, and entrepreneurs.",
+            "category": "business",
+            "price_kes": 200,
+            "stock": 14,
+            "tag": "Staff pick",
+            "cover_image": "/static/img/covers/build-tony-fadell.jpg",
+            "cover_bg": "#FF6B35",       # tangerine
+            "cover_fg": "#1B1340",
+            "cover_accent": "#FFFFFF",
+            "cover_shape": "rounded_square",
+            "variants": [
+                ("Hardcover", 200, 10),
+                ("Paperback", 200, 15),
+            ]
+        },
+
+        # --- PROGRAMMING BOOKS (Priced at 999 KES) ---
+        {
+            "title": "Clean Code: A Handbook of Agile Software Craftsmanship",
+            "slug": "clean-code",
+            "author": "Robert C. Martin",
+            "description": "Even bad code can function. But if code isn't clean, it can bring a development organization to its knees. Master software expert Robert C. Martin presents a revolutionary paradigm with Clean Code.\n\nLearn how to write code that is clean, readable, robust, and maintainable. Packed with real-world case studies and pragmatic refactoring techniques every software engineer must know.",
+            "category": "programming",
+            "price_kes": 999,
+            "stock": 25,
+            "tag": "Bestseller",
+            "cover_image": None,
+            "cover_bg": "#2F6BFF",       # blue
+            "cover_fg": "#FFFFFF",
+            "cover_accent": "#FFD23F",   # sunshine
+            "cover_shape": "arch",
+            "variants": [
+                ("Paperback", 999, 20),
+                ("Hardcover", 999, 5),
+                ("eBook", 999, 100),
+            ]
+        },
+        {
+            "title": "The Pragmatic Programmer",
+            "slug": "the-pragmatic-programmer",
+            "author": "David Thomas, Andrew Hunt",
+            "description": "Your journey to mastery. The Pragmatic Programmer illustrates the core principles of software craftsmanship, helping engineers avoid the pitfalls of software development.\n\nTopics range from personal responsibility and career development to architectural techniques for keeping your code flexible and easy to adapt and reuse.",
+            "category": "programming",
+            "price_kes": 999,
+            "stock": 30,
+            "tag": "Staff pick",
+            "cover_image": None,
+            "cover_bg": "#6C3BFF",       # violet
+            "cover_fg": "#FFFFFF",
+            "cover_accent": "#2EC4A0",   # mint
+            "cover_shape": "circle",
+            "variants": [
+                ("Paperback", 999, 25),
+                ("Hardcover", 999, 5),
+            ]
+        },
+        {
+            "title": "Automate the Boring Stuff with Python",
+            "slug": "automate-the-boring-stuff",
+            "author": "Al Sweigart",
+            "description": "Practical programming for total beginners. If you've ever spent hours renaming files or updating hundreds of spreadsheet cells, you know how tedious tasks can be. Learn how to write simple Python programs to do in minutes what would take you hours by hand.",
+            "category": "programming",
+            "price_kes": 999,
+            "stock": 28,
+            "tag": "New",
+            "cover_image": None,
+            "cover_bg": "#FFD23F",       # sunshine
+            "cover_fg": "#1B1340",
+            "cover_accent": "#2F6BFF",   # blue
+            "cover_shape": "rounded_square",
+            "variants": [
+                ("Paperback", 999, 20),
+                ("eBook", 999, 100),
+            ]
+        },
+        {
+            "title": "Designing Data-Intensive Applications",
+            "slug": "designing-data-intensive-applications",
+            "author": "Martin Kleppmann",
+            "description": "The big ideas behind reliable, scalable, and maintainable systems. Martin Kleppmann helps you navigate the diverse and fast-changing landscape of technologies for processing and storing data.\n\nPeer under the hood of databases, distributed systems, replication, partitioning, transactions, and stream processing.",
+            "category": "programming",
+            "price_kes": 999,
+            "stock": 18,
+            "tag": "Bestseller",
+            "cover_image": None,
+            "cover_bg": "#0E6B56",       # forest
+            "cover_fg": "#FFFFFF",
+            "cover_accent": "#FF6B35",   # tangerine
+            "cover_shape": "leaf",
+            "variants": [
+                ("Paperback", 999, 12),
+                ("Hardcover", 999, 6),
+            ]
+        },
+        {
+            "title": "Python Crash Course",
+            "slug": "python-crash-course",
+            "author": "Eric Matthes",
+            "description": "A hands-on, project-based introduction to programming. Python Crash Course is the world's best-selling guide to the Python programming language.\n\nThis fast-paced, thorough introduction will have you writing programs, solving problems, and developing functional web applications in no time.",
+            "category": "programming",
+            "price_kes": 999,
+            "stock": 24,
+            "tag": "Staff pick",
+            "cover_image": None,
+            "cover_bg": "#2EC4A0",       # mint
+            "cover_fg": "#1B1340",
+            "cover_accent": "#6C3BFF",   # violet
+            "cover_shape": "circle",
+            "variants": [
+                ("Paperback", 999, 20),
+                ("eBook", 999, 100),
+            ]
+        },
+
+        # --- OTHER FICTION & GENERAL BOOKS ---
         {
             "title": "Tomorrow, and Tomorrow, and Tomorrow",
             "slug": "tomorrow-and-tomorrow-and-tomorrow",
@@ -85,26 +265,6 @@ def seed_data():
             ]
         },
         {
-            "title": "The Psychology of Money",
-            "slug": "the-psychology-of-money",
-            "author": "Morgan Housel",
-            "description": "Doing well with money is not simply about mathematics or financial equations—it is about how you behave. In The Psychology of Money, Morgan Housel shares 19 short, captivating stories exploring the strange ways humans perceive wealth, risk, ego, and happiness.\n\nYou will learn why financial freedom is really about sleeping well at night, how compounding works in the real world, and why keeping money requires humility while making money requires risk. A modern finance classic for every investor.",
-            "category": "business",
-            "price_kes": 1650,
-            "stock": 20,
-            "tag": "Bestseller",
-            "cover_image": "/static/img/covers/the-psychology-of-money.jpg",
-            "cover_bg": "#FFD23F",       # sunshine
-            "cover_fg": "#1B1340",
-            "cover_accent": "#FF6B35",   # tangerine
-            "cover_shape": "rounded_square",
-            "variants": [
-                ("Paperback", 1650, 15),
-                ("Hardcover", 2400, 5),
-                ("eBook", 850, 100),
-            ]
-        },
-        {
             "title": "The Boy, The Mole, The Fox and The Horse",
             "slug": "the-boy-the-mole-the-fox-and-the-horse",
             "author": "Charlie Mackesy",
@@ -141,25 +301,6 @@ def seed_data():
                 ("Paperback", 1750, 16),
                 ("Hardcover", 2500, 6),
                 ("eBook", 900, 100),
-            ]
-        },
-        {
-            "title": "Build: An Unorthodox Guide to Making Things Worth Making",
-            "slug": "build-tony-fadell",
-            "author": "Tony Fadell",
-            "description": "Tony Fadell led the teams that created the iPod, the iPhone, and the Nest Learning Thermostat. Build delivers pragmatic mentorship forged across thirty-plus years in Silicon Valley.\n\nFrom handling workplace conflict and choosing startup co-founders to product design principles that thrill customers, this is the definitive playbook for makers, managers, and entrepreneurs.",
-            "category": "business",
-            "price_kes": 2250,
-            "stock": 14,
-            "tag": "Staff pick",
-            "cover_image": "/static/img/covers/build-tony-fadell.jpg",
-            "cover_bg": "#FF6B35",       # tangerine
-            "cover_fg": "#1B1340",
-            "cover_accent": "#FFFFFF",
-            "cover_shape": "rounded_square",
-            "variants": [
-                ("Hardcover", 2250, 10),
-                ("Paperback", 1850, 15),
             ]
         },
         {
@@ -274,12 +415,18 @@ def seed_data():
                 )
                 db.session.add(variant)
         else:
-            # Update category and description
+            # Update category, description, pricing, and active status
             book.category_id = cat.id
             book.description = b_data["description"]
+            book.price_kes = b_data["price_kes"]
             book.tag = b_data.get("tag")
+            book.is_active = True
             if b_data.get("cover_image"):
                 book.cover_image = b_data["cover_image"]
+
+            # Synchronize variants prices
+            for v in book.variants:
+                v.price_kes = b_data["price_kes"]
 
     db.session.commit()
 
@@ -288,4 +435,4 @@ if __name__ == "__main__":
     app = create_app()
     with app.app_context():
         seed_data()
-        print("Database seeded with books, categories and demo users!")
+        print("Database seeded with books, categories and updated prices!")
