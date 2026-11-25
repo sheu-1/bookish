@@ -1,4 +1,3 @@
-import os
 import requests
 from pathlib import Path
 from app import create_app
@@ -8,25 +7,25 @@ from app.models import Book
 COVERS_DIR = Path(__file__).resolve().parent / "static" / "img" / "covers"
 COVERS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Direct OpenLibrary or reliable cover IDs / URLs
-BOOK_COVERS_MAP = {
-    "the-psychology-of-money": "https://covers.openlibrary.org/b/id/10522818-L.jpg",
-    "atomic-habits": "https://covers.openlibrary.org/b/id/12843460-L.jpg",
-    "tomorrow-and-tomorrow-and-tomorrow": "https://covers.openlibrary.org/b/id/12836262-L.jpg",
-    "yellowface": "https://covers.openlibrary.org/b/id/13460742-L.jpg",
-    "the-seven-husbands-of-evelyn-hugo": "https://covers.openlibrary.org/b/id/12665126-L.jpg",
-    "the-boy-the-mole-the-fox-and-the-horse": "https://covers.openlibrary.org/b/id/10186100-L.jpg",
-    "where-the-wild-things-are": "https://covers.openlibrary.org/b/id/8316269-L.jpg",
-    "big-magic": "https://covers.openlibrary.org/b/id/7942718-L.jpg",
-    "book-lovers": "https://covers.openlibrary.org/b/id/12648744-L.jpg",
-    "build-tony-fadell": "https://covers.openlibrary.org/b/id/12871318-L.jpg",
+# Verified ISBN-13 lists per book slug (primary + alternate editions)
+BOOK_ISBNS_MAP = {
+    "the-psychology-of-money": ["9780857197689", "9780857199096"],
+    "atomic-habits": ["9780735211292", "9781847941831"],
+    "tomorrow-and-tomorrow-and-tomorrow": ["9780593321201", "9780735243361", "9780593466490"],
+    "yellowface": ["9780063250833", "9780063250857"],
+    "the-seven-husbands-of-evelyn-hugo": ["9781501161933", "9781501139239", "9781982147662"],
+    "the-boy-the-mole-the-fox-and-the-horse": ["9780062976581", "9781529105100"],
+    "where-the-wild-things-are": ["9780060254926", "9780064431781", "9780099408390"],
+    "big-magic": ["9781594634710", "9781594634727"],
+    "book-lovers": ["9780593440872", "9780593334836"],
+    "build-tony-fadell": ["9780552177757", "9781787634114", "9780063046061"],
 }
 
 def download_and_assign_covers():
     app = create_app()
     with app.app_context():
         headers = {"User-Agent": "BookishStore/1.0 (contact@bookish.co)"}
-        for slug, img_url in BOOK_COVERS_MAP.items():
+        for slug, isbns in BOOK_ISBNS_MAP.items():
             book = Book.query.filter_by(slug=slug).first()
             if not book:
                 print(f"Book '{slug}' not found in database.")
@@ -34,24 +33,30 @@ def download_and_assign_covers():
 
             local_filename = f"{slug}.jpg"
             local_path = COVERS_DIR / local_filename
+            saved = False
 
-            try:
-                print(f"Downloading cover for '{book.title}' from {img_url}...")
-                resp = requests.get(img_url, headers=headers, timeout=15)
-                if resp.status_code == 200 and len(resp.content) > 1000:
-                    with open(local_path, "wb") as f:
-                        f.write(resp.content)
-                    
-                    # Store static path in db
-                    book.cover_image = f"/static/img/covers/{local_filename}"
-                    print(f"-> Successfully saved to {local_path} ({len(resp.content)} bytes)")
-                else:
-                    print(f"-> Bad response {resp.status_code} or small file ({len(resp.content)} bytes)")
-            except Exception as e:
-                print(f"-> Error fetching cover for {slug}: {e}")
+            for isbn in isbns:
+                img_url = f"https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg?default=false"
+                try:
+                    print(f"Trying '{book.title}' ISBN {isbn}...")
+                    resp = requests.get(img_url, headers=headers, timeout=15)
+                    if resp.status_code == 200 and len(resp.content) > 5000:
+                        with open(local_path, "wb") as f:
+                            f.write(resp.content)
+                        book.cover_image = f"/static/img/covers/{local_filename}"
+                        print(f"-> Saved {local_filename} ({len(resp.content)} bytes)")
+                        saved = True
+                        break
+                    else:
+                        print(f"-> Skipped {isbn} (status={resp.status_code}, size={len(resp.content)})")
+                except Exception as e:
+                    print(f"-> Error for {isbn}: {e}")
+
+            if not saved:
+                print(f"WARNING: Could not download cover for '{book.title}'")
 
         db.session.commit()
-        print("All covers updated in database successfully!")
+        print("Finished updating book covers!")
 
 if __name__ == "__main__":
     download_and_assign_covers()
