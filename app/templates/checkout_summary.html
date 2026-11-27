@@ -68,16 +68,26 @@
           <span style="font-family: var(--font-display); font-size: 38px; font-weight: 800; color: var(--sunshine);">{{ total | kes }}</span>
         </div>
 
-        <!-- Form submitting to /checkout/pay -->
+        <!-- Direct M-Pesa STK Push (uses phone already entered at checkout) -->
+        <form action="{{ url_for('payments.pay') }}" method="POST" style="margin-bottom: 12px;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="payment_method" value="mpesa">
+          <button type="submit" class="btn btn-tangerine btn-lg" style="width: 100%;">
+            <span>Pay with M-Pesa ({{ delivery_info.phone }})</span>
+          </button>
+        </form>
+
+        <!-- Fallback: Card / Other methods via Paystack Hosted Checkout -->
         <form action="{{ url_for('payments.pay') }}" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn btn-tangerine btn-lg" style="width: 100%;">
-            <span>Pay securely with Paystack</span>
+          <input type="hidden" name="payment_method" value="hosted">
+          <button type="submit" class="btn btn-outlined-white btn-sm" style="width: 100%; border-color: rgba(255,255,255,0.45); color: var(--white);">
+            <span>Or pay with Card / Airtel Money</span>
           </button>
         </form>
 
         <p style="text-align: center; margin-top: 14px; font-size: 13px; color: var(--lavender-text); font-weight: 500;">
-          You'll choose M-Pesa or card on the next step.
+          Clicking M-Pesa sends the STK prompt straight to {{ delivery_info.phone }} — no re-entering your number!
         </p>
 
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15); font-size: 12px; color: var(--lavender-text); text-align: center;">

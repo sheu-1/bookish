@@ -22,6 +22,19 @@ def _headers():
 def new_reference(order_id: int) -> str:
     return f"BK-{order_id}-{secrets.token_hex(6)}"
 
+def normalize_kenyan_phone(phone: str) -> str:
+    """Normalizes Kenyan phone numbers (e.g. 0799608845 -> +254799608845) for Paystack M-Pesa."""
+    cleaned = "".join(ch for ch in (phone or "") if ch.isdigit() or ch == "+").strip()
+    if cleaned.startswith("+254"):
+        return cleaned
+    if cleaned.startswith("254") and len(cleaned) >= 12:
+        return f"+{cleaned}"
+    if cleaned.startswith("0") and len(cleaned) >= 10:
+        return f"+254{cleaned[1:]}"
+    if len(cleaned) == 9 and cleaned[0] in ("7", "1"):
+        return f"+254{cleaned}"
+    return cleaned
+
 def is_mock_mode() -> bool:
     key = current_app.config.get("PAYSTACK_SECRET_KEY", "")
     mock_flag = current_app.config.get("PAYSTACK_MOCK_ENABLED", False)
@@ -85,6 +98,58 @@ def initialize(email: str, amount_kes: int, reference: str, callback_url: str, m
         raise RuntimeError(msg)
 
     return body["data"]   # authorization_url, access_code, reference
+
+def charge_mpesa(email: str, amount_kes: int, phone: str, reference: str, metadata: dict):
+    """
+    Triggers a direct M-Pesa STK Push via Paystack Charge API without redirecting
+    to the Paystack hosted modal (so the customer doesn't enter their phone twice).
+    """
+    normalized_phone = normalize_kenyan_phone(phone)
+
+    if is_mock_mode():
+        logger.info(f"Using Paystack sandbox mock M-Pesa charge for {reference} ({normalized_phone})")
+        _MOCK_TRANSACTIONS[reference] = {
+            "status": "pending",
+            "amount": int(amount_kes * 100),
+            "currency": "KES",
+            "reference": reference,
+            "customer": {"email": email},
+            "metadata": metadata,
+            "id": secrets.randbelow(9000000) + 1000000,
+            "channel": "mobile_money",
+        }
+        return {
+            "status": "pay_offline",
+            "reference": reference,
+            "display_text": f"M-Pesa prompt sent to {normalized_phone}.",
+        }
+
+    payload = {
+        "email": email,
+        "amount": int(amount_kes * 100),
+        "currency": "KES",
+        "reference": reference,
+        "mobile_money": {
+            "phone": normalized_phone,
+            "provider": "mpesa",
+        },
+        "metadata": metadata,
+    }
+
+    logger.info(f"Calling Paystack API /charge (mpesa) for ref {reference}, phone {normalized_phone}, amount KES {amount_kes}")
+    try:
+        r = requests.post(f"{BASE}/charge", json=payload, headers=_headers(), timeout=20)
+        body = r.json()
+    except requests.RequestException as e:
+        logger.error(f"Paystack M-Pesa charge network error: {e}")
+        raise RuntimeError("Could not connect to M-Pesa gateway. Please try again.")
+
+    if not body.get("status"):
+        msg = body.get("message", "M-Pesa STK push failed")
+        logger.error(f"Paystack M-Pesa charge returned status false: {msg}")
+        raise RuntimeError(msg)
+
+    return body["data"]
 
 def verify(reference: str):
     """

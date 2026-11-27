@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm M-Pesa Payment — bookish{% endblock %}
+
+{% block content %}
+<section style="padding: 60px 0 80px;">
+  <div class="container" style="max-width: 620px;">
+    <div class="card" style="padding: 40px; text-align: center; background-color: var(--white);">
+      <div style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--mint); border: var(--border-ink); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 36px; box-shadow: var(--shadow-hard-sm);">
+        📱
+      </div>
+
+      <span class="hero-pill-tag" style="background-color: var(--sunshine); margin-bottom: 12px;">M-Pesa STK Push Sent</span>
+      <h1 style="font-size: 38px; margin-bottom: 12px;">Check your phone!</h1>
+      <p style="font-size: 17px; color: var(--ink); line-height: 1.6; margin-bottom: 24px;">
+        We've sent an M-Pesa prompt to <strong>{{ order.delivery_phone }}</strong> for
+        <strong style="color: var(--violet);">{{ order.total_kes | kes }}</strong>.
+        Enter your M-Pesa PIN on your phone to complete your order.
+      </p>
+
+      <div style="background-color: var(--cream); border: var(--border-ink); border-radius: 18px; padding: 18px; margin-bottom: 28px; font-size: 14px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--muted); font-weight: 700;">Order Reference</span>
+          <span style="font-family: monospace; font-weight: 800;">{{ reference }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--muted); font-weight: 700;">Status</span>
+          <span id="statusText" style="font-weight: 800; color: var(--violet);">Waiting for M-Pesa PIN (<span id="countdown">180</span>s)...</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <a href="{{ url_for('payments.callback', reference=reference) }}" class="btn btn-tangerine btn-lg" style="width: 100%;">
+          <span>I've entered my PIN &rarr; Verify Payment</span>
+        </a>
+        <a href="{{ url_for('payments.checkout_summary') }}" style="font-size: 14px; font-weight: 700; color: var(--violet); text-decoration: underline; margin-top: 6px;">
+          Didn't get the prompt? Go back to retry or pay by card
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const statusUrl = "{{ url_for('payments.payment_status', reference=reference) }}";
+const callbackUrl = "{{ url_for('payments.callback', reference=reference) }}";
+let secondsLeft = 180;
+
+const timerEl = document.getElementById("countdown");
+const statusEl = document.getElementById("statusText");
+
+const countdownInterval = setInterval(() => {
+  secondsLeft--;
+  if (secondsLeft <= 0) {
+    clearInterval(countdownInterval);
+    clearInterval(pollInterval);
+    statusEl.textContent = "Prompt timed out. Click Verify Payment or go back to retry.";
+    return;
+  }
+  timerEl.textContent = secondsLeft;
+}, 1000);
+
+const pollInterval = setInterval(async () => {
+  try {
+    const res = await fetch(statusUrl, { headers: { "Accept": "application/json" } });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.status === "paid") {
+      clearInterval(countdownInterval);
+      clearInterval(pollInterval);
+      statusEl.textContent = "Payment confirmed! Redirecting...";
+      window.location.href = callbackUrl;
+    } else if (data.status === "payment_failed") {
+      clearInterval(countdownInterval);
+      clearInterval(pollInterval);
+      window.location.href = callbackUrl;
+    }
+  } catch (e) {
+    // Ignore transient network errors while polling
+  }
+}, 3000);
+</script>
+{% endblock %}

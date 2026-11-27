@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, render_template, abort, current_app, flash, session
+from flask import Blueprint, request, redirect, url_for, render_template, abort, current_app, flash, session, jsonify
 from flask_login import current_user
 from app.cart.services import cart_lines, cart_subtotal_kes, calculate_delivery_fee, clear_cart, get_or_create_cart
 from app.extensions import db, csrf
@@ -147,7 +147,26 @@ def pay():
     order.reference = paystack.new_reference(order.id)
     db.session.commit()
 
+    payment_method = request.form.get("payment_method", "hosted")
     callback_url = url_for("payments.callback", _external=True)
+
+    # Direct M-Pesa STK Push using the phone number already entered at checkout
+    if payment_method == "mpesa" and order.delivery_phone:
+        try:
+            charge_data = paystack.charge_mpesa(
+                email=email,
+                amount_kes=order.total_kes,
+                phone=order.delivery_phone,
+                reference=order.reference,
+                metadata={"order_id": order.id, "email": email},
+            )
+            if charge_data.get("status") == "success":
+                return redirect(url_for("payments.callback", reference=order.reference))
+            return redirect(url_for("payments.mpesa_pending", reference=order.reference))
+        except Exception as e:
+            current_app.logger.error(f"Paystack M-Pesa charge error: {e}")
+            flash(f"M-Pesa prompt failed ({e}). You can retry or use card checkout below.", "error")
+            return redirect(url_for("payments.checkout_summary"))
 
     try:
         data = paystack.initialize(
@@ -162,6 +181,23 @@ def pay():
         current_app.logger.error(f"Paystack initialize error: {e}")
         flash(f"Payment initiation failed: {str(e)}", "error")
         return redirect(url_for("payments.checkout_summary"))
+
+@bp.get("/payment/mpesa/<reference>")
+def mpesa_pending(reference):
+    order = Order.query.filter_by(reference=reference).first_or_404()
+    if order.status == "paid":
+        clear_cart()
+        session.pop("checkout_delivery", None)
+        return render_template("payment_success.html", reference=reference, order=order)
+    return render_template("mpesa_pending.html", order=order, reference=reference)
+
+@bp.get("/payment/status/<reference>")
+def payment_status(reference):
+    order = Order.query.filter_by(reference=reference).first_or_404()
+    if order.status == "paid":
+        return jsonify({"status": "paid"})
+    result = verify_and_complete(reference)
+    return jsonify({"status": result})
 
 @bp.get("/payment/callback")
 def callback():

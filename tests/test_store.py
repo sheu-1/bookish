@@ -363,3 +363,33 @@ def test_newsletter_subscription(client):
     res_dup = client.post("/newsletter", data={"email": "reader@example.com"}, follow_redirects=True)
     assert res_dup.status_code == 200
 
+def test_direct_mpesa_stk_push_flow(client):
+    assert paystack.normalize_kenyan_phone("0799608845") == "+254799608845"
+    assert paystack.normalize_kenyan_phone("+254799608845") == "+254799608845"
+
+    book = Book.query.first()
+    client.post("/cart/add", data={"book_id": book.id, "quantity": 1})
+    client.post("/checkout/details", data={
+        "name": "M-Pesa Direct User",
+        "email": "mpesa@example.com",
+        "phone": "0799608845",
+        "address": "Westlands, Nairobi",
+    })
+
+    # Trigger direct M-Pesa STK push (no Paystack modal redirect)
+    res = client.post("/checkout/pay", data={"payment_method": "mpesa"})
+    assert res.status_code == 302
+    assert "/payment/mpesa/" in res.headers["Location"]
+
+    order = Order.query.order_by(Order.id.desc()).first()
+    res_pending = client.get(f"/payment/mpesa/{order.reference}")
+    assert res_pending.status_code == 200
+    assert b"0799608845" in res_pending.data
+    assert b"Check your phone!" in res_pending.data
+
+    # Simulate M-Pesa PIN entered -> status endpoint reports paid
+    paystack.update_mock_status(order.reference, "success", channel="mobile_money")
+    res_status = client.get(f"/payment/status/{order.reference}")
+    assert res_status.status_code == 200
+    assert res_status.get_json()["status"] == "paid"
+
