@@ -14,20 +14,29 @@ except OSError:
 
 load_dotenv(BASE_DIR / ".env")
 
+from sqlalchemy.pool import NullPool
+
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-bookish-12345")
     db_path = (INSTANCE_DIR / "bookish.db").as_posix()
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL") or f"sqlite:///{db_path}"
+    raw_db_url = (os.getenv("DATABASE_URL") or "").strip().strip('"').strip("'")
+    SQLALCHEMY_DATABASE_URI = raw_db_url or f"sqlite:///{db_path}"
     if SQLALCHEMY_DATABASE_URI.startswith("sqlite:///instance/"):
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"
     # Fix for Heroku/Render postgres prefix:
     if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
+    # Ensure SSL for Supabase Postgres if not already specified
+    if ".supabase." in SQLALCHEMY_DATABASE_URI and "sslmode=" not in SQLALCHEMY_DATABASE_URI:
+        sep = "&" if "?" in SQLALCHEMY_DATABASE_URI else "?"
+        SQLALCHEMY_DATABASE_URI = f"{SQLALCHEMY_DATABASE_URI}{sep}sslmode=require"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_pre_ping": True,
-    }
+    SQLALCHEMY_ENGINE_OPTIONS = (
+        {"poolclass": NullPool}
+        if os.getenv("VERCEL")
+        else {"pool_pre_ping": True}
+    )
 
     # Session & Cookie Security
     SESSION_COOKIE_HTTPONLY = True
