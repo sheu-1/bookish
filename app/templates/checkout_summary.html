@@ -3,13 +3,21 @@
 {% block title %}Checkout & Payment — bookish{% endblock %}
 
 {% block content %}
-<section style="padding: 40px 0 80px;">
-  <div class="container" style="max-width: 900px;">
-    <h1 style="font-size: 52px; margin-bottom: 32px;">Review & Pay</h1>
+<section class="checkout-section">
+  <div class="container" style="max-width: 960px;">
+    <nav class="shop-breadcrumb" style="margin-bottom: 20px;">
+      <a href="{{ url_for('cart.view') }}" style="color: var(--ink); opacity: 0.8;">Cart</a>
+      <span>/</span>
+      <a href="{{ url_for('payments.checkout_details') }}" style="color: var(--ink); opacity: 0.8;">Delivery</a>
+      <span>/</span>
+      <span style="font-weight: 800;">Review & Pay</span>
+    </nav>
 
-    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: start;">
+    <h1 class="checkout-page-title">Review &amp; Pay</h1>
+
+    <div class="checkout-review-grid">
       <!-- Left: Order Review -->
-      <div class="card" style="padding: 32px;">
+      <div class="card checkout-card-panel">
         <h2 style="font-size: 24px; margin-bottom: 16px;">Delivery Details</h2>
         <div style="background-color: var(--cream); border: var(--border-ink); border-radius: 18px; padding: 18px; margin-bottom: 24px; font-size: 15px;">
           <div><strong>Recipient:</strong> {{ delivery_info.name }}</div>
@@ -19,27 +27,27 @@
           {% if delivery_info.notes %}
             <div><strong>Notes:</strong> {{ delivery_info.notes }}</div>
           {% endif %}
-          <div style="margin-top: 8px;">
-            <a href="{{ url_for('payments.checkout_details') }}" style="color: var(--violet); font-weight: 700; text-decoration: underline;">Edit details</a>
+          <div style="margin-top: 10px;">
+            <a href="{{ url_for('payments.checkout_details') }}" style="color: var(--violet); font-weight: 700; text-decoration: underline;">&larr; Edit delivery details</a>
           </div>
         </div>
 
         <h2 style="font-size: 24px; margin-bottom: 16px;">Items in your order</h2>
         <div style="display: flex; flex-direction: column; gap: 12px;">
           {% for line in lines %}
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(27, 19, 64, 0.12); padding-bottom: 10px; gap: 12px;">
               <div>
-                <div style="font-weight: 700;">{{ line.book.title }} &times; {{ line.qty }}</div>
+                <div style="font-weight: 700; font-size: 15px;">{{ line.book.title }} &times; {{ line.qty }}</div>
                 <div style="font-size: 13px; color: var(--muted);">{{ line.format_name }}</div>
               </div>
-              <div style="font-weight: 800;">{{ line.line_total_kes | kes }}</div>
+              <div style="font-weight: 800; font-size: 16px; white-space: nowrap;">{{ line.line_total_kes | kes }}</div>
             </div>
           {% endfor %}
         </div>
       </div>
 
       <!-- Right: Paystack Trigger Card (Violet) -->
-      <div class="card" style="background-color: var(--violet); color: var(--white); padding: 36px;">
+      <div class="card checkout-payment-card">
         <h2 style="font-size: 28px; color: var(--white); margin-bottom: 24px;">Order Summary</h2>
 
         <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: var(--lavender-text);">

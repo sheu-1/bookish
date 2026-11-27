@@ -147,6 +147,12 @@ def pay():
     order.reference = paystack.new_reference(order.id)
     db.session.commit()
 
+    try:
+        from app.notifications import notify_order_placed
+        notify_order_placed(order)
+    except Exception as e:
+        logger.error(f"Order placed notification error: {e}")
+
     payment_method = request.form.get("payment_method", "hosted")
     callback_url = url_for("payments.callback", _external=True)
 

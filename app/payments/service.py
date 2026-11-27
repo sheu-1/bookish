@@ -63,4 +63,11 @@ def verify_and_complete(reference: str) -> str:
             item.book.stock = max(0, item.book.stock - item.quantity)
 
     db.session.commit()
+
+    try:
+        from app.notifications import notify_order_paid
+        notify_order_paid(order)
+    except Exception as e:
+        logger.error(f"Order paid notification error: {e}")
+
     return "paid"

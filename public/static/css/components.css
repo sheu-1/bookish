@@ -656,14 +656,59 @@
   .search-pill-form {
     display: none;
   }
+  .mobile-search-row {
+    display: block;
+  }
   .mobile-bottom-tabs {
     display: flex;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    height: calc(62px + env(safe-area-inset-bottom, 0px));
   }
   body {
-    padding-bottom: 64px;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
   }
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 32px;
   }
+}
+
+/* Mobile Search Bar Component */
+.mobile-search-row {
+  display: none;
+  padding: 0 var(--page-padding-mobile) 12px;
+}
+
+.mobile-search-form {
+  display: flex;
+  align-items: center;
+  background-color: var(--white);
+  border: var(--border-ink);
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  box-shadow: 2px 2px 0 var(--ink);
+  width: 100%;
+}
+
+.mobile-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+  padding: 4px;
+}
+
+.mobile-search-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
 }
